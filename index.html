@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Deploying Python in production: containers, kubernetes and embracing yaml</title>
+
+	<meta name="description" content="A talk for NHS RPySoc Conference 2025">
+	<meta name="author" content="Amadeus Stevenson">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/serif.css" id="theme">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	<style>
+		.reveal pre code {
+			overflow-x: hidden !important;
+		}
+
+		/* two-column helper (based on https://stackoverflow.com/a/44392145) */
+		.reveal .container {
+			display: flex;
+			gap: 1rem;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.reveal .col {
+			flex: 1;
+		}
+
+		.reveal .col img {
+			max-width: 100%;
+			height: auto;
+			display: block;
+			object-fit: contain;
+		}
+
+		@media (max-width: 520px) {
+			.reveal .container {
+				flex-direction: column;
+			}
+
+			.reveal .col img {
+				max-width: 100%;
+			}
+		}
+
+		/* Prevent images from overflowing the slide viewport.
+		   Shrink images to fit the available height while keeping aspect ratio. */
+		.reveal .slides section img {
+			/* reduce earlier max-height; 75vh keeps room for headers/controls and
+			   prevents the image from feeling 'too large' on common displays */
+			max-height: 75vh;
+			max-width: 100%;
+			width: auto;
+			height: auto;
+			display: block;
+			margin: 0 auto;
+			object-fit: contain;
+		}
+	</style>
+	<script>
+		var urlParams = new URLSearchParams(window.location.search);
+		var slides = document.querySelectorAll('[data-background-image]');
+
+		// Remove background images only when printing (print-pdf mode).
+		if (urlParams.has('print-pdf')) {
+			slides.forEach(function (slide) {
+				if (slide.hasAttribute('data-background-image')) {
+					slide.removeAttribute('data-background-image');
+				}
+			});
+		}
+	</script>
+</head>
+
+<body>
+
+	<div class="reveal">
+
+		<!-- Any section element inside of this container is displayed as a slide -->
+		<div class="slides">
+			<section>
+				<h2>Deploying Python in production: <h3>containers, kubernetes and embracing yaml</h3>
+				</h2>
+			</section>
+			<section>
+				<h2>In 2023</h2>
+				<img src="img/sean_bean.jpg" alt="">
+			</section>
+			<section>
+				<h2>In 2025</h2>
+				<img src="img/sean_bean_2025.jpg" alt="">
+			</section>
+			<section>
+				<h3>CV</h3>
+				<p>
+				<ul>
+					<li>Principal Engineer, Newton's Tree</li>
+					<li>Technical Lead, Outcomes Based Healthcare</li>
+					<li>Data/Technology Lead, NHS AI Lab (NHSX)</li>
+					<li>CTO/CPO, Decoded</li>
+					<li>PhD in "nanomedicine" (Biological Physics)</li>
+				</ul>
+				</p>
+			</section>
+			<section data-background-image="img/newtons-tree.png">
+			</section>
+			<section>
+				<div class="container">
+					<div class="col">
+						<img src="img/container-what-is-container.avif" alt="Illustration: what is a container">
+					</div>
+					<div class="col">
+						<img src="img/kubernetes-cluster-architecture.webp"
+							alt="Kubernetes cluster architecture diagram">
+					</div>
+				</div>
+			</section>
+			<section>
+				<h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
+			</section>
+			<section>
+				<h2>step 1: create a web-based service</p>
+			</section>
+			<section>
+				<h2>step 2: create a container</h2>
+			</section>
+			<section>
+				<img src="img/container_then.png">
+			</section>
+			<section>
+				<img src="img/container_now.png">
+			</section>
+			<section>
+				<h2>step 3: deploy the container into a kubernetes (k8s) cluster</h2>
+			</section>
+
+			<section>
+				<h3>Takeaways / Q&A</h3>
+				<ol style="list-style:none; padding-left: 0">
+					<li>👉 Containers = reproducible, self-contained, and versioned</li>
+					<li>👉 k8s = high availablility container deployment</li>
+					<li>👉 there are <strong>many</strong> ways of deploying resources in k8s</li>
+				</ol>
+			</section>
+
+		</div>
+
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/zoom/zoom.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/search/search.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+
+		// Workaround for iframes and print mode
+		// By default I add a static background image, which is removed if print mode
+		// not detected
+		var urlParams = new URLSearchParams(window.location.search);
+		var slides = document.querySelectorAll('[data-background-image]');
+
+		// Remove background images only when printing (print-pdf mode).
+		if (urlParams.has('print-pdf')) {
+			slides.forEach(function (slide) {
+				if (slide.hasAttribute('data-background-image')) {
+					slide.removeAttribute('data-background-image');
+				}
+			});
+		}
+
+		// Also available as an ES module, see:
+		// https://revealjs.com/initialization/
+		Reveal.initialize({
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			transition: 'none',
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+
+	</script>
+
+</body>
+
+</html>
