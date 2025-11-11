@@ -24,6 +24,10 @@
   <style>
     .reveal pre code {
       overflow-x: hidden !important;
+      /* allow code to wrap onto multiple lines when necessary */
+      white-space: pre-wrap !important;
+      word-wrap: break-word !important;
+      word-break: break-word !important;
     }
 
     /* two-column helper (based on https://stackoverflow.com/a/44392145) */
@@ -114,18 +118,25 @@
         </div>
         <!-- Image source / caption (uses Reveal-friendly classes) -->
         <p class="notes" style="text-align:center; font-size:0.8rem; opacity:0.9; margin-top:0.5rem;">
-          Source: <a href="https://www.docker.com/resources/what-container/" target="_blank"
-            rel="noopener">docker.com/resources/what-container/</a>
+          Source: docker.com/resources/what-container/
         </p>
       </section>
       <section>
-        <img src="img/kubernetes-cluster-architecture.webp" alt="Kubernetes cluster architecture diagram">
+        <section><img src="img/Borg_cube_ship_over_earth.webp" alt="Borg cube">
+          <p class="notes" style="text-align:center; font-size:0.8rem; opacity:0.9; margin-top:0.5rem;">
+            Source: https://memory-beta.fandom.com/wiki/Borg_cube</p>
+        </section>
+        <section><img src="img/kubernetes-cluster-architecture.webp" alt="Kubernetes cluster architecture diagram">
+          <p class="notes" style="text-align:center; font-size:0.8rem; opacity:0.9; margin-top:0.5rem;">
+            Source: https://aws.plainenglish.io/kubernetes-architecture-c93cb9c798d8</p>
+
+        </section>
       </section>
       <section>
         <h3>Disclaimer</h3>
         <ol style="list-style:none; padding-left: 0">
           <li>DCB 0129 (manufacturer) e.g. QMS</li>
-          <li>DCB 0160 (healthcare org)</li>
+          <li>DCB 0160 (hospital)</li>
           <li>UK GDPR</li>
           <li>UK MDR</li>
         </ol>
@@ -149,11 +160,11 @@ def validate(number: str = Query(..., description="NHS number to validate")):
 
 ...
                     </code></pre>
-          <a href="http://localhost:8888/validate?number=4698194180" target="_blank">
-            <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
 $ uvicorn nhs_number_api.main:app --host 0.0.0.0 --port 8000
-                    </code></pre>
-          </a>
+                    </code>
+                  </pre>
         </section>
       </section>
 
@@ -173,8 +184,7 @@ FROM python:3.11-slim
 WORKDIR /app
 COPY pyproject.toml ./
 COPY src ./src
-CMD ["uvicorn", "nhs_number_api.main:app",
-     "--host", "0.0.0.0", "--port", "8888"]
+CMD ["uvicorn", "nhs_number_api.main:app", "--host", "0.0.0.0", "--port", "8888"]
                     </code></pre>
 
           <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
@@ -186,6 +196,10 @@ $ docker build -f Containerfile -t nhs-number-api:v0.0.1 .
 $ docker run --rm -p 8888:8888 --read-only nhs-number-api:v0.0.1
                     </code></pre>
           </a>
+
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ docker push ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api:v0.0.1
+            </code></pre>
 
         </section>
       </section>
@@ -199,18 +213,57 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nhs-number-api
-  namespace: nhsrpysoc
 spec:
   replicas: 1
   template:
     spec:
       containers:
         - name: nhs-number-api
-          image: ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api:v0.0.1
+          image: ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api
+          tag: v0.0.1
           ports:
             - containerPort: 8888
-              name: http
-                    </code></pre>
+              name: http</code></pre>
+        </section>
+        <section>
+          <pre><code class="hljs yaml" data-trim data-noescape>
+apiVersion: v1
+kind: Service
+metadata:
+  name: nhs-number-api
+spec:
+  type: ClusterIP
+  selector:
+    app: nhs-number-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8888
+      protocol: TCP
+</code></pre>
+        </section>
+        <section>
+          <pre><code class="hljs yaml" data-trim data-noescape>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nhs-number-api
+spec:
+  rules:
+    - host: nhs-rpysoc.rsna.newtonstree.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nhs-number-api
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - nhs-rpysoc.rsna.newtonstree.ai
+</code></pre>
         </section>
       </section>
 
@@ -220,7 +273,7 @@ spec:
           <li>👉 Containers = reproducible, self-contained, and versioned</li>
           <li>👉 k8s = high availablility container deployment</li>
           <li>👉 there are <strong>many</strong> ways of deploying resources in k8s</li>
-          <li class="fragment">All you need is yaml</li>
+          <li>👉 yaml = Infrastructure as Code (IaC) and GitOps</li>
         </ol>
       </section>
 
