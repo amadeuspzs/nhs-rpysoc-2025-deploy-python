@@ -2,171 +2,253 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
+  <meta charset="utf-8">
 
-	<title>Deploying Python in production: containers, kubernetes and embracing yaml</title>
+  <title>Deploying Python in production: containers, kubernetes and embracing yaml</title>
 
-	<meta name="description" content="A talk for NHS RPySoc Conference 2025">
-	<meta name="author" content="Amadeus Stevenson">
+  <meta name="description" content="A talk for NHS RPySoc Conference 2025">
+  <meta name="author" content="Amadeus Stevenson">
 
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" href="dist/reset.css">
-	<link rel="stylesheet" href="dist/reveal.css">
-	<link rel="stylesheet" href="dist/theme/serif.css" id="theme">
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/serif.css" id="theme">
 
-	<!-- Theme used for syntax highlighting of code -->
-	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css">
 
-	<style>
-		.reveal pre code {
-			overflow-x: hidden !important;
-		}
+  <style>
+    .reveal pre code {
+      overflow-x: hidden !important;
+    }
 
-		/* two-column helper (based on https://stackoverflow.com/a/44392145) */
-		.reveal .container {
-			display: flex;
-			gap: 1rem;
-			align-items: center;
-			justify-content: center;
-		}
+    /* two-column helper (based on https://stackoverflow.com/a/44392145) */
+    .reveal .container {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
 
-		.reveal .col {
-			flex: 1;
-		}
+    .reveal .col {
+      flex: 1;
+    }
 
-		.reveal .col img {
-			max-width: 100%;
-			height: auto;
-			display: block;
-			object-fit: contain;
-		}
+    .reveal .col img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
 
-		@media (max-width: 520px) {
-			.reveal .container {
-				flex-direction: column;
-			}
+    @media (max-width: 520px) {
+      .reveal .container {
+        flex-direction: column;
+      }
 
-			.reveal .col img {
-				max-width: 100%;
-			}
-		}
+      .reveal .col img {
+        max-width: 100%;
+      }
+    }
 
-		/* Prevent images from overflowing the slide viewport.
-		   Shrink images to fit the available height while keeping aspect ratio. */
-		.reveal .slides section img {
-			/* reduce earlier max-height; 75vh keeps room for headers/controls and
-			   prevents the image from feeling 'too large' on common displays */
-			max-height: 75vh;
-			max-width: 100%;
-			width: auto;
-			height: auto;
-			display: block;
-			margin: 0 auto;
-			object-fit: contain;
-		}
-	</style>
+    /* Prevent images from overflowing the slide viewport.
+           Shrink images to fit the available height while keeping aspect ratio. */
+    .reveal .slides section img {
+      /* reduce earlier max-height; 75vh keeps room for headers/controls and
+               prevents the image from feeling 'too large' on common displays */
+      max-height: 75vh;
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+  </style>
 </head>
 
 <body>
 
-	<div class="reveal">
+  <div class="reveal">
 
-		<!-- Any section element inside of this container is displayed as a slide -->
-		<div class="slides">
-			<section>
-				<h2>Deploying Python in production: <h3>containers, kubernetes and embracing yaml</h3>
-				</h2>
-			</section>
-			<section>
-				<h2>In 2023</h2>
-				<img src="img/sean_bean.jpg" alt="">
-			</section>
-			<section>
-				<h2>In 2025</h2>
-				<img src="img/sean_bean_2025.jpg" alt="">
-			</section>
-			<section>
-				<h3>CV</h3>
-				<p>
-				<ul>
-					<li>Principal Engineer, Newton's Tree</li>
-					<li>Technical Lead, Outcomes Based Healthcare</li>
-					<li>Data/Technology Lead, NHS AI Lab (NHSX)</li>
-					<li>CTO/CPO, Decoded</li>
-					<li>PhD in "nanomedicine" (Biological Physics)</li>
-				</ul>
-				</p>
-			</section>
-			<section data-background-image="img/newtons-tree.png">
-			</section>
-			<section>
-				<div class="container">
-					<div class="col">
-						<img src="img/container-what-is-container.avif" alt="Illustration: what is a container">
-					</div>
-					<div class="col">
-						<img src="img/kubernetes-cluster-architecture.webp"
-							alt="Kubernetes cluster architecture diagram">
-					</div>
-				</div>
-			</section>
-			<section>
-				<h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
-			</section>
-			<section>
-				<h2>step 1: create a web-based service</p>
-			</section>
-			<section>
-				<h2>step 2: create a container</h2>
-			</section>
-			<section>
-				<img src="img/container_then.png">
-			</section>
-			<section>
-				<img src="img/container_now.png">
-			</section>
-			<section>
-				<h2>step 3: deploy the container into a kubernetes (k8s) cluster</h2>
-			</section>
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+      <section>
+        <h2>Deploying Python in production: <h3>containers, kubernetes and embracing yaml</h3>
+        </h2>
+      </section>
+      <section>
+        <h2>In 2023</h2>
+        <img src="img/sean_bean.jpg" alt="">
+      </section>
+      <section>
+        <h2>In 2025</h2>
+        <img src="img/sean_bean_2025.jpg" alt="">
+      </section>
+      <section>
+        <h3>CV</h3>
+        <p>
+        <ul>
+          <li>Principal Engineer, Newton's Tree</li>
+          <li>Technical Lead, Outcomes Based Healthcare</li>
+          <li>Data/Technology Lead, NHS AI Lab (NHSX)</li>
+          <li>CTO/CPO, Decoded</li>
+          <li>PhD in "nanomedicine" (Biological Physics)</li>
+        </ul>
+        </p>
+      </section>
+      <section data-background-image="img/newtons-tree.png">
+      </section>
+      <section>
+        <div class="container">
+          <div class="col">
+            <img src="img/container-vm-whatcontainer_2.png" alt="Illustration: VM">
+          </div>
+          <div class="col fragment" style="background-color: white;">
+            <img src="img/container-what-is-container.avif" alt="Illustration: what is a container">
+          </div>
+        </div>
+        <!-- Image source / caption (uses Reveal-friendly classes) -->
+        <p class="notes" style="text-align:center; font-size:0.8rem; opacity:0.9; margin-top:0.5rem;">
+          Source: <a href="https://www.docker.com/resources/what-container/" target="_blank"
+            rel="noopener">docker.com/resources/what-container/</a>
+        </p>
+      </section>
+      <section>
+        <img src="img/kubernetes-cluster-architecture.webp" alt="Kubernetes cluster architecture diagram">
+      </section>
+      <section>
+        <h3>Disclaimer</h3>
+        <ol style="list-style:none; padding-left: 0">
+          <li>DCB 0129 (manufacturer) e.g. QMS</li>
+          <li>DCB 0160 (healthcare org)</li>
+          <li>UK GDPR</li>
+          <li>UK MDR</li>
+        </ol>
+      </section>
+      <section>
+        <h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
+      </section>
+      <section>
+        <!-- vertical slides -->
+        <section>
+          <h2>step 1: create a web-based service</p>
+        </section>
+        <section>
+          <pre><code class="hljs python" data-trim data-noescape>
+import fastapi
+import nhs_number
 
-			<section>
-				<h3>Takeaways / Q&A</h3>
-				<ol style="list-style:none; padding-left: 0">
-					<li>👉 Containers = reproducible, self-contained, and versioned</li>
-					<li>👉 k8s = high availablility container deployment</li>
-					<li>👉 there are <strong>many</strong> ways of deploying resources in k8s</li>
-				</ol>
-			</section>
+@app.get("/validate", response_model=ValidationResponse)
+def validate(number: str = Query(..., description="NHS number to validate")):
+    return {"valid": nhs_number.is_valid(number)}
 
-		</div>
+...
+                    </code></pre>
+          <a href="http://localhost:8888/validate?number=4698194180" target="_blank">
+            <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ uvicorn nhs_number_api.main:app --host 0.0.0.0 --port 8000
+                    </code></pre>
+          </a>
+        </section>
+      </section>
 
-	</div>
+      <section>
+        <section>
+          <h2>step 2: create a container</h2>
+        </section>
+        <section>
+          <img src="img/container_then.png">
+        </section>
+        <section>
+          <img src="img/container_now.png">
+        </section>
+        <section>
+          <pre><code class="hljs dockerfile" data-trim data-noescape>
+FROM python:3.11-slim
+WORKDIR /app
+COPY pyproject.toml ./
+COPY src ./src
+CMD ["uvicorn", "nhs_number_api.main:app",
+     "--host", "0.0.0.0", "--port", "8888"]
+                    </code></pre>
 
-	<script type="module">
-		import Reveal from './dist/reveal.esm.js';
-		import Zoom from './plugin/zoom/zoom.esm.js';
-		import Notes from './plugin/notes/notes.esm.js';
-		import Search from './plugin/search/search.esm.js';
-		import Markdown from './plugin/markdown/markdown.esm.js';
-		import Highlight from './plugin/highlight/highlight.esm.js';
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ docker build -f Containerfile -t nhs-number-api:v0.0.1 .
+                    </code></pre>
 
-		// Reveal.js initialization
-		// More info: https://revealjs.com/config/
-		Reveal.initialize({
-			controls: true,
-			progress: true,
-			center: true,
-			hash: true,
-			transition: 'none', // none/fade/slide/convex/concave/zoom
+          <a href="http://localhost:8888/validate?number=4698194180" target="_blank">
+            <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ docker run --rm -p 8888:8888 --read-only nhs-number-api:v0.0.1
+                    </code></pre>
+          </a>
 
-			// Learn about plugins: https://revealjs.com/plugins/
-			plugins: [Zoom, Notes, Search, Markdown, Highlight]
-		});
-	</script>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h2>step 3: deploy the container into a kubernetes (k8s) cluster</h2>
+        </section>
+        <section>
+          <pre><code class="hljs yaml" data-trim data-noescape>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nhs-number-api
+  namespace: nhsrpysoc
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: nhs-number-api
+          image: ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api:v0.0.1
+          ports:
+            - containerPort: 8888
+              name: http
+                    </code></pre>
+        </section>
+      </section>
+
+      <section>
+        <h3>Takeaways / Q&A</h3>
+        <ol style="list-style:none; padding-left: 0">
+          <li>👉 Containers = reproducible, self-contained, and versioned</li>
+          <li>👉 k8s = high availablility container deployment</li>
+          <li>👉 there are <strong>many</strong> ways of deploying resources in k8s</li>
+          <li class="fragment">All you need is yaml</li>
+        </ol>
+      </section>
+
+    </div>
+
+  </div>
+
+  <script type="module">
+    import Reveal from './dist/reveal.esm.js';
+    import Zoom from './plugin/zoom/zoom.esm.js';
+    import Notes from './plugin/notes/notes.esm.js';
+    import Search from './plugin/search/search.esm.js';
+    import Markdown from './plugin/markdown/markdown.esm.js';
+    import Highlight from './plugin/highlight/highlight.esm.js';
+
+    // Reveal.js initialization
+    // More info: https://revealjs.com/config/
+    Reveal.initialize({
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      transition: 'none', // none/fade/slide/convex/concave/zoom
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [Zoom, Notes, Search, Markdown, Highlight]
+    });
+  </script>
 
 </body>
 
