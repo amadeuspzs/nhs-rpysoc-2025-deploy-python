@@ -72,6 +72,27 @@
       margin: 0 auto;
       object-fit: contain;
     }
+
+    /* Inline demo tag: placed under the inline link and left-aligned within the slide */
+    .demo-inline-wrapper {
+      margin-top: 0.25rem;
+    }
+
+    .demo-inline {
+      display: inline-block;
+      /* background: rgba(255, 255, 255, 0.9); */
+      color: #003866;
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .demo-inline:focus {
+      outline: 2px solid rgba(0, 56, 102, 0.18);
+      outline-offset: 2px;
+    }
   </style>
 </head>
 
@@ -133,6 +154,9 @@
         </section>
       </section>
       <section>
+        <h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
+      </section>
+      <section>
         <h3>Disclaimer</h3>
         <ol style="list-style:none; padding-left: 0">
           <li>DCB 0129 (manufacturer) e.g. QMS</li>
@@ -142,14 +166,15 @@
         </ol>
       </section>
       <section>
-        <h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
-      </section>
-      <section>
         <!-- vertical slides -->
         <section>
           <h2>step 1: create a web-based service</p>
         </section>
         <section>
+          <div class="demo-inline-wrapper">
+            <a href="http://0.0.0.0:8888/validate?number=4698194180" class="demo-inline" target="_blank"
+              rel="noopener noreferrer">🔗</a>
+          </div>
           <pre><code class="hljs python" data-trim data-noescape>
 import fastapi
 import nhs_number
@@ -162,9 +187,10 @@ def validate(number: str = Query(..., description="NHS number to validate")):
                     </code></pre>
 
           <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
-$ uvicorn nhs_number_api.main:app --host 0.0.0.0 --port 8000
+$ uvicorn nhs_number_api.main:app --host 0.0.0.0 --port 8888
                     </code>
                   </pre>
+
         </section>
       </section>
 
@@ -179,11 +205,16 @@ $ uvicorn nhs_number_api.main:app --host 0.0.0.0 --port 8000
           <img src="img/container_now.png">
         </section>
         <section>
+          <div class="demo-inline-wrapper">
+            <a href="http://0.0.0.0:8888/validate?number=4698194180" class="demo-inline" target="_blank"
+              rel="noopener noreferrer">🔗</a>
+          </div>
           <pre><code class="hljs dockerfile" data-trim data-noescape>
 FROM python:3.11-slim
 WORKDIR /app
 COPY pyproject.toml ./
 COPY src ./src
+RUN pip install --no-cache-dir .
 CMD ["uvicorn", "nhs_number_api.main:app", "--host", "0.0.0.0", "--port", "8888"]
                     </code></pre>
 
@@ -191,12 +222,9 @@ CMD ["uvicorn", "nhs_number_api.main:app", "--host", "0.0.0.0", "--port", "8888"
 $ docker build -f Containerfile -t nhs-number-api:v0.0.1 .
                     </code></pre>
 
-          <a href="http://localhost:8888/validate?number=4698194180" target="_blank">
-            <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
 $ docker run --rm -p 8888:8888 --read-only nhs-number-api:v0.0.1
                     </code></pre>
-          </a>
-
           <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
 $ docker push ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api:v0.0.1
             </code></pre>
@@ -206,6 +234,9 @@ $ docker push ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api:v0.0.1
       <section>
         <section>
           <h2>step 3: deploy the container into a kubernetes (k8s) cluster</h2>
+        </section>
+        <section>
+          <img src="img/k8s-diag.png">
         </section>
         <section>
           <pre><code class="hljs yaml" data-trim data-noescape>
@@ -224,6 +255,14 @@ spec:
           ports:
             - containerPort: 8888
               name: http</code></pre>
+
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl apply -f deployment.yaml
+                    </code></pre>
+
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl get pods -n nhsrpysoc
+                    </code></pre>
         </section>
         <section>
           <pre><code class="hljs yaml" data-trim data-noescape>
@@ -241,8 +280,15 @@ spec:
       targetPort: 8888
       protocol: TCP
 </code></pre>
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl apply -f service.yaml
+                    </code></pre>
         </section>
         <section>
+          <div class="demo-inline-wrapper">
+            <a href="https://nhs-rpysoc.rsna.newtonstree.ai/validate?number=4698194180" class="demo-inline"
+              target="_blank" rel="noopener noreferrer">🔗</a>
+          </div>
           <pre><code class="hljs yaml" data-trim data-noescape>
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -264,16 +310,26 @@ spec:
     - hosts:
         - nhs-rpysoc.rsna.newtonstree.ai
 </code></pre>
+          <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl apply -f ingress.yaml
+                    </code></pre>
+        </section>
+        <section>
+          <img src="img/k8s-diag.png">
         </section>
       </section>
 
       <section>
         <h3>Takeaways / Q&A</h3>
         <ol style="list-style:none; padding-left: 0">
-          <li>👉 Containers = reproducible, self-contained, and versioned</li>
-          <li>👉 k8s = high availablility container deployment</li>
-          <li>👉 there are <strong>many</strong> ways of deploying resources in k8s</li>
-          <li>👉 yaml = Infrastructure as Code (IaC) and GitOps</li>
+          <li class="fragment">👉 Containers = reproducible, self-contained, and versioned</li>
+          <li class="fragment">👉 k8s = high availablility container deployment</li>
+          <li class="fragment">👉 there are <strong>many</strong> ways of deploying resources in k8s</li>
+          <li class="fragment">👉 yaml = Infrastructure as Code (IaC) and GitOps</li>
+          <li style="margin-top: 2em;text-align: center; font-size: 0.5em">🧑‍💻
+            https://github.com/amadeuspzs/nhs-rpysoc-2025-deploy-python</li>
+          <li style="text-align: center; font-size: 0.5em">💾 https://github.com/amadeuspzs/nhs-number-api</li>
+          <li></li>
         </ol>
       </section>
 
