@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Deploying Python in production: containers, kubernetes and embracing yaml</title>
+
+  <meta name="description" content="A talk for NHS RPySoc Conference 2025">
+  <meta name="author" content="Amadeus Stevenson">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/serif.css" id="theme">
+
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css">
+
+  <style>
+    .reveal pre code {
+      overflow-x: hidden !important;
+      /* allow code to wrap onto multiple lines when necessary */
+      white-space: pre-wrap !important;
+      word-wrap: break-word !important;
+      word-break: break-word !important;
+    }
+
+    /* two-column helper (based on https://stackoverflow.com/a/44392145) */
+    .reveal .container {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reveal .col {
+      flex: 1;
+    }
+
+    .reveal .col img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    @media (max-width: 520px) {
+      .reveal .container {
+        flex-direction: column;
+      }
+
+      .reveal .col img {
+        max-width: 100%;
+      }
+    }
+
+    /* Prevent images from overflowing the slide viewport.
+           Shrink images to fit the available height while keeping aspect ratio. */
+    .reveal .slides section img {
+      /* reduce earlier max-height; 75vh keeps room for headers/controls and
+               prevents the image from feeling 'too large' on common displays */
+      max-height: 75vh;
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+
+    /* Inline demo tag: placed under the inline link and left-aligned within the slide */
+    .demo-inline-wrapper {
+      margin-top: 0.25rem;
+    }
+
+    .demo-inline {
+      display: inline-block;
+      /* background: rgba(255, 255, 255, 0.9); */
+      color: #003866;
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .demo-inline:focus {
+      outline: 2px solid rgba(0, 56, 102, 0.18);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+      <section>
+        <h2>Deploying Python in production: <h3>containers, kubernetes and embracing yaml</h3>
+        </h2>
+      </section>
+      <section>
+        <h2>In 2023</h2>
+        <img src="img/sean_bean.jpg" alt="">
+      </section>
+      <section>
+        <h2>In 2025</h2>
+        <img src="img/sean_bean_2025.jpg" alt="">
+      </section>
+      <section>
+        <h3>CV</h3>
+        <p>
+        <ul>
+          <li>Principal Engineer, Newton's Tree</li>
+          <li>Technical Lead, Outcomes Based Healthcare</li>
+          <li>Data/Technology Lead, NHS AI Lab (NHSX)</li>
+          <li>CTO/CPO, Decoded</li>
+          <li>PhD in "nanomedicine" (Biological Physics)</li>
+        </ul>
+        </p>
+      </section>
+      <section data-background-image="img/newtons-tree.png">
+      </section>
+      <section>
+        <div class="container">
+          <div class="col">
+            <img src="img/container-vm-whatcontainer_2.png" alt="Illustration: VM">
+          </div>
+          <div class="col fragment" style="background-color: white;">
+            <img src="img/container-what-is-container.avif" alt="Illustration: what is a container">
+          </div>
+        </div>
+        <!-- Image source / caption (uses Reveal-friendly classes) -->
+        <p class="notes" style="text-align:center; font-size:0.8rem; opacity:0.9; margin-top:0.5rem;">
+          Source: docker.com/resources/what-container/
+        </p>
+      </section>
+      <section><img src="img/Borg_cube_ship_over_earth.webp" alt="Borg cube">
+        <p class="notes" style="text-align:center; font-size:0.8rem; opacity:0.9; margin-top:0.5rem;">
+          Source: https://memory-beta.fandom.com/wiki/Borg_cube</p>
+      </section>
+      <section><img src="img/kubernetes-cluster-architecture.webp" alt="Kubernetes cluster architecture diagram">
+        <p class="notes" style="text-align:center; font-size:0.8rem; opacity:0.9; margin-top:0.5rem;">
+          Source: https://aws.plainenglish.io/kubernetes-architecture-c93cb9c798d8</p>
+
+      </section>
+      <section>
+        <h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
+      </section>
+      <section>
+        <section><img src="img/backup-nhs-number.png"></section>
+      </section>
+      <section>
+        <h3>Disclaimer</h3>
+        <ol style="list-style:none; padding-left: 0">
+          <li>DCB 0129 (manufacturer) e.g. QMS</li>
+          <li>DCB 0160 (hospital)</li>
+          <li>UK GDPR</li>
+          <li>UK MDR</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>step 1: create a web-based service</p>
+      </section>
+      <section>
+        <div class="demo-inline-wrapper">
+          <a href="http://0.0.0.0:8888/validate?number=4698194180" class="demo-inline" target="_blank"
+            rel="noopener noreferrer">🔗</a>
+        </div>
+        <pre><code class="hljs python" data-trim data-noescape>
+import fastapi
+import nhs_number
+
+@app.get("/validate", response_model=ValidationResponse)
+def validate(number: str = Query(..., description="NHS number to validate")):
+    return {"valid": nhs_number.is_valid(number)}
+
+...
+                    </code></pre>
+
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ uvicorn nhs_number_api.main:app --host 0.0.0.0 --port 8888
+                    </code>
+                  </pre>
+      </section>
+      <section><img src="img/backup-web-service.png"></section>
+
+      <section>
+        <h2>step 2: create a container</h2>
+      </section>
+      <section>
+        <img src="img/container_then.png">
+      </section>
+      <section>
+        <img src="img/container_now.png">
+      </section>
+      <section>
+        <div class="demo-inline-wrapper">
+          <a href="http://0.0.0.0:8888/validate?number=4698194180" class="demo-inline" target="_blank"
+            rel="noopener noreferrer">🔗</a>
+        </div>
+        <pre><code class="hljs dockerfile" data-trim data-noescape>
+FROM python:3.11-slim
+WORKDIR /app
+COPY pyproject.toml ./
+COPY src ./src
+RUN pip install --no-cache-dir .
+CMD ["uvicorn", "nhs_number_api.main:app", "--host", "0.0.0.0", "--port", "8888"]
+                    </code></pre>
+
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ docker build -f Containerfile -t nhs-number-api:v0.0.1 .
+                    </code></pre>
+
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ docker run --rm -p 8888:8888 --read-only nhs-number-api:v0.0.1
+                    </code></pre>
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ docker push ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api:v0.0.1
+            </code></pre>
+
+      </section>
+      <section><img src="img/backup-web-service.png"></section>
+
+      <section>
+        <h2>step 3: deploy the container into a kubernetes (k8s) cluster</h2>
+      </section>
+      <section>
+        <img src="img/k8s-diag.png">
+      </section>
+      <section>
+        <pre><code class="hljs yaml" data-trim data-noescape>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nhs-number-api
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: nhs-number-api
+          image: ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api
+          tag: v0.0.1
+          ports:
+            - containerPort: 8888
+              name: http</code></pre>
+
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl apply -f deployment.yaml
+                    </code></pre>
+
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl get pods -n nhsrpysoc
+                    </code></pre>
+      </section>
+      <section>
+        <pre><code class="hljs yaml" data-trim data-noescape>
+apiVersion: v1
+kind: Service
+metadata:
+  name: nhs-number-api
+spec:
+  type: ClusterIP
+  selector:
+    app: nhs-number-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8888
+      protocol: TCP
+</code></pre>
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl apply -f service.yaml
+                    </code></pre>
+      </section>
+      <section>
+        <div class="demo-inline-wrapper">
+          <a href="https://nhs-rpysoc.rsna.newtonstree.ai/validate?number=4698194180" class="demo-inline"
+            target="_blank" rel="noopener noreferrer">🔗</a>
+        </div>
+        <pre><code class="hljs yaml" data-trim data-noescape>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nhs-number-api
+spec:
+  rules:
+    - host: nhs-rpysoc.rsna.newtonstree.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nhs-number-api
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - nhs-rpysoc.rsna.newtonstree.ai
+</code></pre>
+        <pre class="fragment"><code class="hljs bash" data-trim data-noescape>
+$ kubectl apply -f ingress.yaml
+                    </code></pre>
+      </section>
+      <section><img src="img/backup-live-ingress.png"></section>
+
+      <section>
+        <img src="img/k8s-diag.png">
+      </section>
+
+      <section>
+        <h3>Takeaways / Q&A</h3>
+        <ol style="list-style:none; padding-left: 0">
+          <li class="fragment">👉 Containers = reproducible, self-contained, and versioned</li>
+          <li class="fragment">👉 k8s = high availablility container deployment</li>
+          <li class="fragment">👉 there are <strong>many</strong> ways of deploying resources in k8s</li>
+          <li class="fragment">👉 yaml = Infrastructure as Code (IaC) and GitOps</li>
+          <li style="margin-top: 2em;text-align: center; font-size: 0.5em">🧑‍💻
+            https://github.com/amadeuspzs/nhs-rpysoc-2025-deploy-python</li>
+          <li style="text-align: center; font-size: 0.5em">💾 https://github.com/amadeuspzs/nhs-number-api</li>
+          <li></li>
+        </ol>
+      </section>
+
+    </div>
+
+  </div>
+
+  <script type="module">
+    import Reveal from './dist/reveal.esm.js';
+    import Zoom from './plugin/zoom/zoom.esm.js';
+    import Notes from './plugin/notes/notes.esm.js';
+    import Search from './plugin/search/search.esm.js';
+    import Markdown from './plugin/markdown/markdown.esm.js';
+    import Highlight from './plugin/highlight/highlight.esm.js';
+
+    // Reveal.js initialization
+    // More info: https://revealjs.com/config/
+    Reveal.initialize({
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      transition: 'none', // none/fade/slide/convex/concave/zoom
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [Zoom, Notes, Search, Markdown, Highlight]
+    });
+  </script>
+
+</body>
+
+</html>
