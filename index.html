@@ -154,7 +154,12 @@
         </section>
       </section>
       <section>
-        <h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
+        <section>
+          <h2>Live demo: <a href="https://uk-fci.github.io/nhs-number/" target="_blank">nhs-number</a></h2>
+        </section>
+        <section>
+          <section><img src="img/backup-nhs-number.png"></section>
+        </section>
       </section>
       <section>
         <h3>Disclaimer</h3>
@@ -190,8 +195,8 @@ def validate(number: str = Query(..., description="NHS number to validate")):
 $ uvicorn nhs_number_api.main:app --host 0.0.0.0 --port 8888
                     </code>
                   </pre>
-
         </section>
+        <section><img src="img/backup-web-service.png"></section>
       </section>
 
       <section>
@@ -230,6 +235,8 @@ $ docker push ghcr.io/amadeuspzs/nhs-number-api/nhs-number-api:v0.0.1
             </code></pre>
 
         </section>
+        <section><img src="img/backup-web-service.png"></section>
+
       </section>
       <section>
         <section>
@@ -314,6 +321,8 @@ spec:
 $ kubectl apply -f ingress.yaml
                     </code></pre>
         </section>
+        <section><img src="img/backup-live-ingress.png"></section>
+
         <section>
           <img src="img/k8s-diag.png">
         </section>
